@@ -44,6 +44,16 @@
     </script>
 </body>
 </html>
+                }
+            })
+            .catch(err => {
+                // ถ้าติดบล็อกข้ามโดเมนแต่บอทยังรันอยู่ ให้ลองเปิดลิงก์ตรงๆ ดู
+                document.getElementById('status-dot').className = 'indicator offline';
+                document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
+            });
+    </script>
+</body>
+</html>
                     document.getElementById('status-dot').className = 'indicator offline';
                     document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
                 }
