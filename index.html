@@ -21,39 +21,18 @@
     </div>
 
     <script>
-        // ยิงตรงไปที่ลิงก์บอทของพี่โดยตรง ไม่ผ่านตัวกลาง
-        fetch('http://fi9.bot-hosting.net:20251/status')
+        // ใช้ตัวกลาง AllOrigins ยิงผ่าน HTTPS เพื่อไปดึงข้อมูลบอทที่เป็น HTTP ให้ปลอดภัย
+        fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('http://fi9.bot-hosting.net:20251/status'))
             .then(response => {
                 if (response.ok) return response.json();
                 throw new Error('Network error');
             })
             .then(data => {
-                if(data.status === 'online') {
+                const botData = JSON.parse(data.contents);
+                if(botData.status === 'online') {
                     document.getElementById('status-dot').className = 'indicator online';
                     document.getElementById('status-text').innerText = 'ออนไลน์ (Online)';
                 } else {
-                    document.getElementById('status-dot').className = 'indicator offline';
-                    document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
-                }
-            })
-            .catch(err => {
-                // ถ้าติดบล็อกข้ามโดเมนแต่บอทยังรันอยู่ ให้ลองเปิดลิงก์ตรงๆ ดู
-                document.getElementById('status-dot').className = 'indicator offline';
-                document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
-            });
-    </script>
-</body>
-</html>
-                }
-            })
-            .catch(err => {
-                // ถ้าติดบล็อกข้ามโดเมนแต่บอทยังรันอยู่ ให้ลองเปิดลิงก์ตรงๆ ดู
-                document.getElementById('status-dot').className = 'indicator offline';
-                document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
-            });
-    </script>
-</body>
-</html>
                     document.getElementById('status-dot').className = 'indicator offline';
                     document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
                 }
