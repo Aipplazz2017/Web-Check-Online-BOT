@@ -8,6 +8,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
         
+        /* --- ตั้งค่าพื้นฐาน --- */
         body { 
             font-family: 'Kanit', sans-serif; 
             background: #09090b; 
@@ -15,15 +16,12 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding-top: 50px; 
+            padding: 50px 20px; 
             min-height: 100vh; 
             margin: 0; 
-            padding-left: 20px;
-            padding-right: 20px;
-            position: relative;
         }
 
-        /* ปุ่ม Discord มุมขวาบน */
+        /* --- ส่วนหัว (Title & Discord) --- */
         .discord-link {
             position: absolute;
             top: 20px;
@@ -34,10 +32,11 @@
         }
         .discord-link:hover { transform: scale(1.1); }
 
-        .title-container { text-align: center; margin-bottom: 25px; }
+        .title-container { text-align: center; margin-bottom: 30px; }
         .main-title { font-size: 1.8rem; font-weight: 600; margin: 0; color: #f8fafc; }
-        .sub-title { font-size: 0.85rem; color: #64748b; margin: 0; }
+        .sub-title { font-size: 0.85rem; color: #64748b; margin-top: 5px; }
         
+        /* --- ส่วนการ์ดแสดงสถานะ --- */
         .card { 
             background: rgba(25, 25, 30, 0.8); 
             backdrop-filter: blur(10px);
@@ -49,71 +48,80 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .bot-name { font-size: 1.1rem; font-weight: 600; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .bot-name { font-size: 1.2rem; font-weight: 600; }
         
-        .status-pill { padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
-        .online { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid #22c55e; }
-        .offline { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
+        .status-pill { padding: 5px 15px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; }
+        .online { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; }
+        .offline { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
 
-        .uptime-container { margin-top: 25px; }
-        .uptime-label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        /* --- ส่วนแถบสถานะ (Bar) --- */
+        .uptime-container { margin-top: 20px; }
+        .uptime-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; }
         
-        .bar-wrapper { display: flex; gap: 2px; height: 35px; width: 100%; }
+        .bar-wrapper { display: flex; gap: 3px; height: 30px; width: 100%; }
         .bar { flex: 1; background: #22c55e; border-radius: 2px; }
         
-        .time { font-size: 0.7rem; color: #475569; margin-top: 15px; }
+        .time { font-size: 0.75rem; color: #475569; margin-top: 20px; text-align: right; }
 
-        /* Footer ด้านล่างสุด */
-        .footer { margin-top: auto; padding: 20px; font-size: 0.75rem; color: #475569; }
+        /* --- Footer --- */
+        .footer { margin-top: auto; padding-top: 40px; font-size: 0.75rem; color: #475569; }
 
+        /* --- Responsive สำหรับมือถือ --- */
         @media (max-width: 480px) {
             .card { padding: 20px; }
-            .main-title { font-size: 1.5rem; }
-            .bar-wrapper { height: 25px; }
+            .bar-wrapper { height: 25px; gap: 2px; }
         }
     </style>
 </head>
 <body>
 
-    <a href="URL_ลิงก์เชิญของคุณที่นี่" target="_blank" class="discord-link">
+    <a href="https://discord.gg/QekBfN38nU" target="_blank" class="discord-link" title="เข้าสู่ Discord">
         <i class="fab fa-discord"></i>
     </a>
 
     <div class="title-container">
-        <h1 class="main-title">Check Status BOT</h1>
-        <p class="sub-title">สร้างโดย Hsn</p>
+        <h1 class="main-title">ᴄʜᴇᴄᴋ ꜱᴛᴀᴛᴜꜱ ʙᴏᴛ</h1>
+        <p class="sub-title">ระบบตรวจสอบสถานะบอทออนไลน์ ⁻ ᵇʸ ᴰᵒᶻᵃʳᵉˢ</p></p>
     </div>
 
     <div class="card">
         <div class="header">
-            <div id="bot-name" class="bot-name">กำลังโหลด...</div>
+            <div id="bot-name" class="bot-name">กำลังโหลดข้อมูล...</div>
             <div id="status-badge" class="status-pill offline">
                 <span id="status-text">OFFLINE</span>
             </div>
         </div>
 
         <div class="uptime-container">
-            <div class="uptime-label">
-                <span>สถานะ 30 วันล่าสุด</span>
-            </div>
+            <div class="uptime-label">สถานะการทำงานในช่วง 30 วันที่ผ่านมา</div>
             <div class="bar-wrapper" id="history-bar">
-                <script>for(let i=0; i<30; i++) document.write('<div class="bar"></div>');</script>
+                <script>
+                    // สร้างแถบสถานะ 30 วันอัตโนมัติ
+                    for(let i=0; i<30; i++) {
+                        document.write('<div class="bar"></div>');
+                    }
+                </script>
             </div>
         </div>
 
-        <div id="time" class="time">กำลังอัปเดตข้อมูล...</div>
+        <div id="time" class="time">ตรวจสอบข้อมูลล่าสุด...</div>
     </div>
 
-    <div class="footer">© 2017-2026 Hsn Status Page</div>
+    <div class="footer">© 2017 2028 ᵇʸ ᴰᵒᶻᵃʳᵉˢ Developer. All rights reserved.</div>
 
     <script>
+        // ฟังก์ชันดึงสถานะจาก JSON
         fetch(`status.json?t=${new Date().getTime()}`)
             .then(res => res.json())
             .then(data => {
                 const now = Math.floor(Date.now() / 1000);
                 const isOnline = (now - data.last_seen < 360);
+                
+                // อัปเดตชื่อบอท
                 document.getElementById('bot-name').innerText = data.bot_name;
+                
+                // อัปเดตสถานะและสี
                 const badge = document.getElementById('status-badge');
                 if (isOnline) {
                     badge.className = 'status-pill online';
@@ -122,7 +130,12 @@
                     badge.className = 'status-pill offline';
                     document.getElementById('status-text').innerText = 'OFFLINE';
                 }
+                
+                // อัปเดตเวลา
                 document.getElementById('time').innerText = 'อัปเดตล่าสุด: ' + new Date(data.last_seen * 1000).toLocaleTimeString('th-TH');
+            })
+            .catch(err => {
+                console.error("Error loading status:", err);
             });
     </script>
 </body>
