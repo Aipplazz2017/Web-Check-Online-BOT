@@ -21,11 +21,16 @@
     </div>
 
     <script>
-        // ยิงไปเช็กที่ลิงก์บอทของคุณโดยตรง
-        fetch('http://fi9.bot-hosting.net:20251/status')
-            .then(response => response.json())
+        // ใช้ตัวกลาง AllOrigins ช่วยดึงข้อมูลเพื่อแก้ปัญหา HTTPS บล็อก HTTP ข้ามเว็บ
+        fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('http://fi9.bot-hosting.net:20251/status'))
+            .then(response => {
+                if (response.ok) return response.json();
+                throw new Error('Network response was not ok.');
+            })
             .then(data => {
-                if(data.status === 'online') {
+                // แปลงข้อความที่ดึงมากลับมาเป็น JSON Object เพื่อเช็กค่า
+                const botData = JSON.parse(data.contents);
+                if(botData.status === 'online') {
                     document.getElementById('status-dot').className = 'indicator online';
                     document.getElementById('status-text').innerText = 'ออนไลน์ (Online)';
                 } else {
