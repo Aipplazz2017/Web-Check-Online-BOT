@@ -2,58 +2,35 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Status Dashboard</title>
+    <title>My Bot Status</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&display=swap');
-        body { font-family: 'Kanit', sans-serif; background: #0f0f12; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1a1a1f; padding: 40px; border-radius: 20px; border: 1px solid #333; text-align: center; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .bot-name { font-size: 22px; font-weight: 500; color: #3b82f6; margin-bottom: 5px; text-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-        .status-box { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 20px 0; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; }
-        .online { background: #22c55e; box-shadow: 0 0 15px #22c55e; }
-        .offline { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
-        .status-text { font-size: 28px; font-weight: 500; letter-spacing: 1px; }
-        .time { font-size: 12px; color: #666; margin-top: 15px; }
+        body { background: #0f0f12; color: #fff; font-family: 'Kanit', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .bot-card { background: #1a1a1f; padding: 20px; border-radius: 15px; margin: 10px; width: 300px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .online { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        .offline { background: #ef4444; }
     </style>
 </head>
 <body>
-
-    <div class="card">
-        <div id="bot-name" class="bot-name">กำลังโหลดชื่อบอท...</div>
-        <div class="status-box">
-            <div id="dot" class="dot offline"></div>
-            <div id="status-text" class="status-text">OFFLINE</div>
-        </div>
-        <div id="time" class="time">-</div>
-    </div>
+    <h1>สถานะบอททั้งหมด</h1>
+    <div id="bot-container"></div>
 
     <script>
-        // ดึงข้อมูลสถานะและชื่อบอทจากไฟล์ JSON ตรงๆ
-        fetch(`status.json?t=${new Date().getTime()}`)
-            .then(res => res.json())
-            .then(data => {
-                const now = Math.floor(Date.now() / 1000);
-                
-                // แสดงชื่อบอทที่ส่งมาจากฝั่งโฮสต์
-                document.getElementById('bot-name').innerText = data.bot_name || "ไม่ทราบชื่อบอท";
-
-                if (now - data.last_seen < 360) {
-                    document.getElementById('dot').className = 'dot online';
-                    document.getElementById('status-text').innerText = 'ONLINE';
-                    document.getElementById('status-text').style.color = '#22c55e';
-                } else {
-                    document.getElementById('dot').className = 'dot offline';
-                    document.getElementById('status-text').innerText = 'OFFLINE';
-                    document.getElementById('status-text').style.color = '#ef4444';
-                }
-                document.getElementById('time').innerText = 'อัปเดตล่าสุด: ' + new Date(data.last_seen * 1000).toLocaleTimeString('th-TH');
-            })
-            .catch(() => {
-                document.getElementById('bot-name').innerText = "เกิดข้อผิดพลาด";
-                document.getElementById('status-text').innerText = 'OFFLINE';
-                document.getElementById('status-text').style.color = '#ef4444';
+        fetch('status.json?t=' + new Date().getTime())
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('bot-container');
+            // สมมติไฟล์ JSON เก็บเป็นรายการ [{name: "...", status: "...", last_seen: 123}, ...]
+            data.bots.forEach(bot => {
+                const isOnline = (Math.floor(Date.now() / 1000) - bot.last_seen < 360);
+                container.innerHTML += `
+                    <div class="bot-card">
+                        <span>${bot.name}</span>
+                        <div class="status-dot ${isOnline ? 'online' : 'offline'}"></div>
+                    </div>
+                `;
             });
+        });
     </script>
 </body>
 </html>
