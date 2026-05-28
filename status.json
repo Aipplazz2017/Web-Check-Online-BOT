@@ -1,1 +1,7 @@
-{"status":"online","bot_name":"Streaming X#6840","last_seen":1779978463}
+{
+  "bots": [
+    { "name": "Streaming X#6840", "last_seen": 1716990000 },
+    { "name": "บอทตัวที่ 2 ของพี่", "last_seen": 1716990000 },
+    { "name": "บอทตัวที่ 3 ของพี่", "last_seen": 1716990000 }
+  ]
+}
