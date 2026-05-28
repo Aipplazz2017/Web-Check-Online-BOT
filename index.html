@@ -3,56 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Status Dashboard</title>
+    <title>Discord Bot Status</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&display=swap');
-        body { font-family: 'Kanit', sans-serif; background: #0f0f12; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1a1a1f; padding: 40px; border-radius: 20px; border: 1px solid #333; text-align: center; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .bot-name { font-size: 22px; font-weight: 500; color: #3b82f6; margin-bottom: 5px; text-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-        .status-box { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 20px 0; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; }
-        .online { background: #22c55e; box-shadow: 0 0 15px #22c55e; }
-        .offline { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
-        .status-text { font-size: 28px; font-weight: 500; letter-spacing: 1px; }
-        .time { font-size: 12px; color: #666; margin-top: 15px; }
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; padding-top: 50px; }
+        .status-card { background: #2a2a2a; padding: 30px; display: inline-block; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .indicator { width: 20px; height: 20px; border-radius: 50%; display: inline-block; margin-right: 10px; vertical-align: middle; }
+        .online { background: #43b581; box-shadow: 0 0 10px #43b581; }
+        .offline { background: #f04747; box-shadow: 0 0 10px #f04747; }
+        #status-text { font-size: 24px; font-weight: bold; }
+        .time-text { font-size: 12px; color: #888; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div id="bot-name" class="bot-name">กำลังโหลดชื่อบอท...</div>
-        <div class="status-box">
-            <div id="dot" class="dot offline"></div>
-            <div id="status-text" class="status-text">OFFLINE</div>
-        </div>
-        <div id="time" class="time">-</div>
+    <div class="status-card">
+        <h2>สถานะบอทดิสคอร์ด</h2>
+        <p><span id="status-dot" class="indicator offline"></span> <span id="status-text">กำลังเช็กสถานะ...</span></p>
+        <div id="time-text" class="time-text"></div>
     </div>
 
     <script>
-        // ดึงข้อมูลสถานะและชื่อบอทจากไฟล์ JSON ตรงๆ
-        fetch(`status.json?t=${new Date().getTime()}`)
-            .then(res => res.json())
+        // ดึงเวลาปัจจุบันมาเทียบ (ใช้ป้องกัน Cache ของ GitHub)
+        const cacheBuster = new Date().getTime();
+        
+        // ไปอ่านค่าจากไฟล์ตรงๆ บน GitHub
+        fetch(`status.json?v=${cacheBuster}`)
+            .then(response => response.json())
             .then(data => {
                 const now = Math.floor(Date.now() / 1000);
-                
-                // แสดงชื่อบอทที่ส่งมาจากฝั่งโฮสต์
-                document.getElementById('bot-name').innerText = data.bot_name || "ไม่ทราบชื่อบอท";
-
+                // ถ้าบอทไม่ได้ส่งสัญญาณมานานเกิน 6 นาที (360 วินาที) ให้ถือว่าบอทดับ (Offline)
                 if (now - data.last_seen < 360) {
-                    document.getElementById('dot').className = 'dot online';
-                    document.getElementById('status-text').innerText = 'ONLINE';
-                    document.getElementById('status-text').style.color = '#22c55e';
+                    document.getElementById('status-dot').className = 'indicator online';
+                    document.getElementById('status-text').innerText = 'ออนไลน์ (Online)';
                 } else {
-                    document.getElementById('dot').className = 'dot offline';
-                    document.getElementById('status-text').innerText = 'OFFLINE';
-                    document.getElementById('status-text').style.color = '#ef4444';
+                    document.getElementById('status-dot').className = 'indicator offline';
+                    document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
                 }
-                document.getElementById('time').innerText = 'อัปเดตล่าสุด: ' + new Date(data.last_seen * 1000).toLocaleTimeString('th-TH');
+                document.getElementById('time-text').innerText = 'อัปเดตล่าสุด: ' + new Date(data.last_seen * 1000).toLocaleTimeString('th-TH');
             })
-            .catch(() => {
-                document.getElementById('bot-name').innerText = "เกิดข้อผิดพลาด";
-                document.getElementById('status-text').innerText = 'OFFLINE';
-                document.getElementById('status-text').style.color = '#ef4444';
+            .catch(err => {
+                document.getElementById('status-dot').className = 'indicator offline';
+                document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
             });
     </script>
 </body>
