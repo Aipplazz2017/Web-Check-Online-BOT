@@ -3,56 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Status Dashboard</title>
+    <title>Bot Status</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&display=swap');
-        body { font-family: 'Kanit', sans-serif; background: #0f0f12; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1a1a1f; padding: 40px; border-radius: 20px; border: 1px solid #333; text-align: center; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .bot-name { font-size: 22px; font-weight: 500; color: #3b82f6; margin-bottom: 5px; text-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-        .status-box { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 20px 0; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; }
-        .online { background: #22c55e; box-shadow: 0 0 15px #22c55e; }
-        .offline { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
-        .status-text { font-size: 28px; font-weight: 500; letter-spacing: 1px; }
-        .time { font-size: 12px; color: #666; margin-top: 15px; }
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
+        
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background: #09090b; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-top: 50px; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding-left: 20px;
+            padding-right: 20px;
+            position: relative;
+        }
+
+        /* ปุ่ม Discord มุมขวาบน */
+        .discord-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #5865F2;
+            font-size: 1.8rem;
+            transition: transform 0.2s;
+        }
+        .discord-link:hover { transform: scale(1.1); }
+
+        .title-container { text-align: center; margin-bottom: 25px; }
+        .main-title { font-size: 1.8rem; font-weight: 600; margin: 0; color: #f8fafc; }
+        .sub-title { font-size: 0.85rem; color: #64748b; margin: 0; }
+        
+        .card { 
+            background: rgba(25, 25, 30, 0.8); 
+            backdrop-filter: blur(10px);
+            padding: 30px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            width: 100%; 
+            max-width: 600px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .bot-name { font-size: 1.1rem; font-weight: 600; }
+        
+        .status-pill { padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
+        .online { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid #22c55e; }
+        .offline { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
+
+        .uptime-container { margin-top: 25px; }
+        .uptime-label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        
+        .bar-wrapper { display: flex; gap: 2px; height: 35px; width: 100%; }
+        .bar { flex: 1; background: #22c55e; border-radius: 2px; }
+        
+        .time { font-size: 0.7rem; color: #475569; margin-top: 15px; }
+
+        /* Footer ด้านล่างสุด */
+        .footer { margin-top: auto; padding: 20px; font-size: 0.75rem; color: #475569; }
+
+        @media (max-width: 480px) {
+            .card { padding: 20px; }
+            .main-title { font-size: 1.5rem; }
+            .bar-wrapper { height: 25px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div id="bot-name" class="bot-name">กำลังโหลดชื่อบอท...</div>
-        <div class="status-box">
-            <div id="dot" class="dot offline"></div>
-            <div id="status-text" class="status-text">OFFLINE</div>
-        </div>
-        <div id="time" class="time">-</div>
+    <a href="URL_ลิงก์เชิญของคุณที่นี่" target="_blank" class="discord-link">
+        <i class="fab fa-discord"></i>
+    </a>
+
+    <div class="title-container">
+        <h1 class="main-title">Check Status BOT</h1>
+        <p class="sub-title">สร้างโดย Hsn</p>
     </div>
 
+    <div class="card">
+        <div class="header">
+            <div id="bot-name" class="bot-name">กำลังโหลด...</div>
+            <div id="status-badge" class="status-pill offline">
+                <span id="status-text">OFFLINE</span>
+            </div>
+        </div>
+
+        <div class="uptime-container">
+            <div class="uptime-label">
+                <span>สถานะ 30 วันล่าสุด</span>
+            </div>
+            <div class="bar-wrapper" id="history-bar">
+                <script>for(let i=0; i<30; i++) document.write('<div class="bar"></div>');</script>
+            </div>
+        </div>
+
+        <div id="time" class="time">กำลังอัปเดตข้อมูล...</div>
+    </div>
+
+    <div class="footer">© 2017-2026 Hsn Status Page</div>
+
     <script>
-        // ดึงข้อมูลสถานะและชื่อบอทจากไฟล์ JSON ตรงๆ
         fetch(`status.json?t=${new Date().getTime()}`)
             .then(res => res.json())
             .then(data => {
                 const now = Math.floor(Date.now() / 1000);
-                
-                // แสดงชื่อบอทที่ส่งมาจากฝั่งโฮสต์
-                document.getElementById('bot-name').innerText = data.bot_name || "ไม่ทราบชื่อบอท";
-
-                if (now - data.last_seen < 360) {
-                    document.getElementById('dot').className = 'dot online';
+                const isOnline = (now - data.last_seen < 360);
+                document.getElementById('bot-name').innerText = data.bot_name;
+                const badge = document.getElementById('status-badge');
+                if (isOnline) {
+                    badge.className = 'status-pill online';
                     document.getElementById('status-text').innerText = 'ONLINE';
-                    document.getElementById('status-text').style.color = '#22c55e';
                 } else {
-                    document.getElementById('dot').className = 'dot offline';
+                    badge.className = 'status-pill offline';
                     document.getElementById('status-text').innerText = 'OFFLINE';
-                    document.getElementById('status-text').style.color = '#ef4444';
                 }
                 document.getElementById('time').innerText = 'อัปเดตล่าสุด: ' + new Date(data.last_seen * 1000).toLocaleTimeString('th-TH');
-            })
-            .catch(() => {
-                document.getElementById('bot-name').innerText = "เกิดข้อผิดพลาด";
-                document.getElementById('status-text').innerText = 'OFFLINE';
-                document.getElementById('status-text').style.color = '#ef4444';
             });
     </script>
 </body>
