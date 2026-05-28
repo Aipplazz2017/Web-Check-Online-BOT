@@ -21,15 +21,14 @@
     </div>
 
     <script>
-        // ใช้ตัวกลาง AllOrigins ยิงผ่าน HTTPS เพื่อไปดึงข้อมูลบอทที่เป็น HTTP ให้ปลอดภัย
-        fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('http://fi9.bot-hosting.net:20251/status'))
-            .then(response => {
-                if (response.ok) return response.json();
-                throw new Error('Network error');
-            })
-            .then(data => {
-                const botData = JSON.parse(data.contents);
-                if(botData.status === 'online') {
+        // ใส่ไอดีบอทดิสคอร์ดของคุณตรงนี้ (ห้ามลบเครื่องหมายเครื่องหมายคำพูดออก)
+        const BOT_ID = '1419970283590254666'; 
+
+        // ดึงข้อมูลสถานะบอทจากระบบ Discord API โดยตรงผ่าน Lanyard
+        fetch(`https://api.lanyard.rest/v1/users/${BOT_ID}`)
+            .then(response => response.json())
+            .then(res => {
+                if (res.success && (res.data.discord_status === 'online' || res.data.discord_status === 'dnd' || res.data.discord_status === 'idle')) {
                     document.getElementById('status-dot').className = 'indicator online';
                     document.getElementById('status-text').innerText = 'ออนไลน์ (Online)';
                 } else {
