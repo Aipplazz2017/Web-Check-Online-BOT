@@ -11,6 +11,7 @@
         .online { background: #43b581; box-shadow: 0 0 10px #43b581; }
         .offline { background: #f04747; box-shadow: 0 0 10px #f04747; }
         #status-text { font-size: 24px; font-weight: bold; }
+        .time-text { font-size: 12px; color: #888; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -18,22 +19,35 @@
     <div class="status-card">
         <h2>สถานะบอทดิสคอร์ด</h2>
         <p><span id="status-dot" class="indicator offline"></span> <span id="status-text">กำลังเช็กสถานะ...</span></p>
+        <div id="time-text" class="time-text"></div>
     </div>
 
     <script>
-        // ใส่ไอดีบอทดิสคอร์ดของคุณตรงนี้ (ห้ามลบเครื่องหมายเครื่องหมายคำพูดออก)
-        const BOT_ID = '1419970283590254666'; 
-
-        // ดึงข้อมูลสถานะบอทจากระบบ Discord API โดยตรงผ่าน Lanyard
-        fetch(`https://api.lanyard.rest/v1/users/${BOT_ID}`)
+        // ดึงเวลาปัจจุบันมาเทียบ (ใช้ป้องกัน Cache ของ GitHub)
+        const cacheBuster = new Date().getTime();
+        
+        // ไปอ่านค่าจากไฟล์ตรงๆ บน GitHub
+        fetch(`status.json?v=${cacheBuster}`)
             .then(response => response.json())
-            .then(res => {
-                if (res.success && (res.data.discord_status === 'online' || res.data.discord_status === 'dnd' || res.data.discord_status === 'idle')) {
+            .then(data => {
+                const now = Math.floor(Date.now() / 1000);
+                // ถ้าบอทไม่ได้ส่งสัญญาณมานานเกิน 6 นาที (360 วินาที) ให้ถือว่าบอทดับ (Offline)
+                if (now - data.last_seen < 360) {
                     document.getElementById('status-dot').className = 'indicator online';
                     document.getElementById('status-text').innerText = 'ออนไลน์ (Online)';
                 } else {
                     document.getElementById('status-dot').className = 'indicator offline';
                     document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
+                }
+                document.getElementById('time-text').innerText = 'อัปเดตล่าสุด: ' + new Date(data.last_seen * 1000).toLocaleTimeString('th-TH');
+            })
+            .catch(err => {
+                document.getElementById('status-dot').className = 'indicator offline';
+                document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
+            });
+    </script>
+</body>
+</html>
                 }
             })
             .catch(err => {
