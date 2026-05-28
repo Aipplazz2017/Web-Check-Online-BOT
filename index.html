@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bot Status</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; padding-top: 50px; }
+        .status-card { background: #2a2a2a; padding: 30px; display: inline-block; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .indicator { width: 20px; height: 20px; border-radius: 50%; display: inline-block; margin-right: 10px; vertical-align: middle; }
+        .online { background: #43b581; box-shadow: 0 0 10px #43b581; }
+        .offline { background: #f04747; box-shadow: 0 0 10px #f04747; }
+        #status-text { font-size: 24px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="status-card">
+        <h2>สถานะบอทดิสคอร์ด</h2>
+        <p><span id="status-dot" class="indicator offline"></span> <span id="status-text">กำลังเช็กสถานะ...</span></p>
+    </div>
+
+    <script>
+        // ยิงไปเช็กที่ลิงก์บอทของคุณโดยตรง
+        fetch('http://fi9.bot-hosting.net:20251/status')
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'online') {
+                    document.getElementById('status-dot').className = 'indicator online';
+                    document.getElementById('status-text').innerText = 'ออนไลน์ (Online)';
+                } else {
+                    document.getElementById('status-dot').className = 'indicator offline';
+                    document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
+                }
+            })
+            .catch(err => {
+                document.getElementById('status-dot').className = 'indicator offline';
+                document.getElementById('status-text').innerText = 'ออฟไลน์ (Offline)';
+            });
+    </script>
+</body>
+</html>
