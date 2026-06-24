@@ -8,7 +8,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
         
-        /* --- ตั้งค่าพื้นฐาน --- */
         body { 
             font-family: 'Kanit', sans-serif; 
             background: #09090b; 
@@ -21,7 +20,6 @@
             margin: 0; 
         }
 
-        /* --- ส่วนหัว (Title & Discord) --- */
         .discord-link {
             position: absolute;
             top: 20px;
@@ -34,6 +32,161 @@
 
         .title-container { text-align: center; margin-bottom: 30px; }
         .main-title { font-size: 1.8rem; font-weight: 600; margin: 0; color: #f8fafc; }
+        .sub-title { font-size: 0.85rem; color: #64748b; margin-top: 5px; }
+
+        /* การ์ดรวม */
+        .card { 
+            background: rgba(25, 25, 30, 0.8); 
+            backdrop-filter: blur(10px);
+            padding: 30px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            width: 100%; 
+            max-width: 600px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            margin-bottom: 16px;
+        }
+
+        /* แถวแต่ละ selfbot */
+        .bot-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .bot-row:last-child { border-bottom: none; }
+
+        .bot-tag { font-size: 1rem; font-weight: 600; }
+        .bot-tag span { font-size: 0.75rem; font-weight: 300; color: #94a3b8; }
+
+        .status-pill { padding: 4px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: bold; }
+        .online  { background: rgba(34,197,94,0.15);  color: #22c55e; border: 1px solid #22c55e; }
+        .offline { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid #ef4444; }
+
+        /* แถบ uptime */
+        .uptime-container { margin-top: 20px; }
+        .uptime-label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; }
+        .bar-wrapper { display: flex; gap: 3px; height: 28px; width: 100%; }
+        .bar { flex: 1; border-radius: 2px; }
+        .bar.green  { background: #22c55e; }
+        .bar.red    { background: #ef4444; }
+
+        .time-text { font-size: 0.72rem; color: #475569; margin-top: 14px; text-align: right; }
+
+        /* summary badge */
+        .summary {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .summary b { color: #22c55e; }
+
+        .footer { margin-top: auto; padding-top: 40px; font-size: 0.75rem; color: #475569; }
+
+        @media (max-width: 480px) {
+            .card { padding: 16px; }
+            .bar-wrapper { height: 22px; gap: 2px; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="https://discord.gg/QekBfN38nU" target="_blank" class="discord-link" title="เข้าสู่ Discord">
+        <i class="fab fa-discord"></i>
+    </a>
+
+    <div class="title-container">
+        <h1 class="main-title">ᴄʜᴇᴄᴋ ꜱᴛᴀᴛᴜꜱ ʙᴏᴛ</h1>
+        <p class="sub-title">ระบบตรวจสอบสถานะบอทออนไลน์ ⁻ ᵇʸ ᴰᵒᶻᵃʳᵉˢ</p>
+    </div>
+
+    <div id="summary" class="summary">กำลังโหลด...</div>
+
+    <!-- การ์ดรายชื่อ selfbot ทั้งหมด -->
+    <div class="card">
+        <div id="bot-list">
+            <div style="color:#64748b; font-size:0.9rem;">กำลังโหลดข้อมูล...</div>
+        </div>
+
+        <div class="uptime-container">
+            <div class="uptime-label">สถานะการทำงาน 30 วันล่าสุด</div>
+            <div class="bar-wrapper" id="history-bar"></div>
+        </div>
+
+        <div id="time" class="time-text">ตรวจสอบข้อมูลล่าสุด...</div>
+    </div>
+
+    <div class="footer">© 2017–2028 ᵇʸ ᴰᵒᶻᵃʳᵉˢ Developer. All rights reserved.</div>
+
+    <script>
+        // สร้างแถบ 30 วัน
+        const bar = document.getElementById('history-bar');
+        for (let i = 0; i < 30; i++) {
+            const d = document.createElement('div');
+            d.className = 'bar green';
+            bar.appendChild(d);
+        }
+
+        // ดึงข้อมูลจาก status.json
+        fetch(`status.json?t=${Date.now()}`)
+            .then(res => res.json())
+            .then(data => {
+                const now = Math.floor(Date.now() / 1000);
+                const isOnline = (now - data.last_seen) < 360; // ถ้าอัพเดตภายใน 6 นาที = online
+
+                // แสดง selfbot แต่ละตัว
+                const list = document.getElementById('bot-list');
+                list.innerHTML = '';
+
+                // รองรับทั้ง format เก่า (bot_name เดียว) และ format ใหม่ (active_selfbots[])
+                const bots = data.active_selfbots && data.active_selfbots.length > 0
+                    ? data.active_selfbots
+                    : [data.bot_name];
+
+                bots.forEach(tag => {
+                    const row = document.createElement('div');
+                    row.className = 'bot-row';
+
+                    // แยก username กับ discriminator
+                    const parts = tag.split('#');
+                    const nameHtml = parts[1]
+                        ? `${parts[0]} <span>#${parts[1]}</span>`
+                        : tag;
+
+                    row.innerHTML = `
+                        <div class="bot-tag">${nameHtml}</div>
+                        <div class="status-pill ${isOnline ? 'online' : 'offline'}">
+                            ${isOnline ? 'ONLINE' : 'OFFLINE'}
+                        </div>
+                    `;
+                    list.appendChild(row);
+                });
+
+                // summary บนสุด
+                const onlineCount = isOnline ? bots.length : 0;
+                document.getElementById('summary').innerHTML =
+                    `กำลังรันอยู่ <b>${onlineCount}</b> / ${bots.length} บอท`;
+
+                // แถบสี — ถ้า offline ให้แถบสุดท้ายเป็นแดง
+                if (!isOnline) {
+                    const bars = bar.querySelectorAll('.bar');
+                    bars[bars.length - 1].className = 'bar red';
+                }
+
+                // เวลาอัพเดต
+                document.getElementById('time').innerText =
+                    'อัปเดตล่าสุด: ' + new Date(data.last_seen * 1000).toLocaleTimeString('th-TH');
+            })
+            .catch(err => {
+                document.getElementById('bot-list').innerHTML =
+                    '<div style="color:#ef4444">โหลดข้อมูลไม่ได้ — ตรวจสอบ status.json</div>';
+                console.error(err);
+            });
+    </script>
+</body>
+</html>
         .sub-title { font-size: 0.85rem; color: #64748b; margin-top: 5px; }
         
         /* --- ส่วนการ์ดแสดงสถานะ --- */
