@@ -3,148 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bot Status</title>
+<title>Bot Status · ᴰᵒᶻᵃʳᵉˢ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
-<style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --bg:#0b0d12;--surface:#11141c;--border:rgba(255,255,255,0.07);
-    --green:#2da44e;--green-hi:#3fb950;--green-dim:rgba(63,185,80,0.1);
-    --red:#f85149;--red-dim:rgba(248,81,73,0.1);
-    --blue:#58a6ff;--blue-dim:rgba(88,166,255,0.1);
-    --muted:#3d444d;--text:#e6edf3;--sub:#7d8590;
-    --mono:'IBM Plex Mono',monospace;--sans:'Noto Sans Thai',sans-serif;
-  }
-  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding:0 0 80px}
-
-  /* TOPBAR */
-  .topbar{border-bottom:1px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(11,13,18,0.92);backdrop-filter:blur(16px);z-index:100}
-  .topbar-logo{font-family:var(--mono);font-size:0.78rem;color:var(--text);letter-spacing:0.06em;display:flex;align-items:center;gap:7px}
-  .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--green-hi)}
-  .topbar-right{display:flex;align-items:center;gap:12px}
-  .global-pill{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:0.68rem;font-weight:600;padding:4px 12px;border-radius:999px;border:1px solid;letter-spacing:0.06em}
-  .global-pill.online{color:var(--green-hi);border-color:rgba(63,185,80,0.35);background:var(--green-dim)}
-  .global-pill.offline{color:var(--red);border-color:rgba(248,81,73,0.35);background:var(--red-dim)}
-  .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
-  .dot.pulse{animation:pulse 2s ease infinite}
-  @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 currentColor}50%{opacity:.7;box-shadow:0 0 0 4px transparent}}
-  .discord-btn{color:#5865f2;text-decoration:none;opacity:.7;transition:opacity .2s}
-  .discord-btn:hover{opacity:1}
-
-  /* HERO */
-  .hero{padding:48px 24px 32px;text-align:center;position:relative;overflow:hidden}
-  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 40% at 50% 0%,rgba(45,164,78,0.07),transparent 70%);pointer-events:none}
-  .hero-eyebrow{font-family:var(--mono);font-size:0.65rem;color:var(--green-hi);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:10px}
-  .hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:600;letter-spacing:-0.02em;line-height:1.15;margin-bottom:7px}
-  .hero-sub{font-size:0.82rem;color:var(--sub);font-weight:300}
-
-  /* CONTAINER */
-  .container{max-width:700px;margin:0 auto;padding:0 18px}
-
-  /* STATS ROW */
-  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px}
-  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 12px;text-align:center}
-  .stat-num{font-family:var(--mono);font-size:1.6rem;font-weight:600;line-height:1}
-  .stat-num.green{color:var(--green-hi)}
-  .stat-num.red{color:var(--red)}
-  .stat-num.blue{color:var(--blue)}
-  .stat-num.dim{color:var(--text)}
-  .stat-label{font-size:0.65rem;color:var(--sub);margin-top:4px}
-
-  /* SECTION HEADER */
-  .section-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;margin-top:22px}
-  .section-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0}
-  .section-icon.bot{background:var(--blue-dim);border:1px solid rgba(88,166,255,0.2)}
-  .section-icon.user{background:var(--green-dim);border:1px solid rgba(63,185,80,0.2)}
-  .section-title{font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase}
-  .section-count{font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-left:auto}
-
-  /* CARD */
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:7px;overflow:visible;transition:border-color .2s}
-  .card:hover{border-color:rgba(255,255,255,0.12)}
-  .card-inner{display:flex;align-items:center;justify-content:space-between;padding:13px 16px 9px;gap:10px}
-  .card-left{display:flex;align-items:center;gap:11px}
-
-  /* AVATAR */
-  .avatar-wrap{position:relative;flex-shrink:0}
-  .avatar-img{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);object-fit:cover}
-  .avatar-fallback{width:38px;height:38px;border-radius:50%;background:#1c2333;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem}
-  /* bot badge on avatar */
-  .bot-badge{position:absolute;bottom:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:#5865f2;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-size:0.45rem;color:#fff;font-weight:700;letter-spacing:0}
-
-  .card-name{font-size:0.88rem;font-weight:600}
-  .card-sub{font-family:var(--mono);font-size:0.65rem;color:var(--sub);margin-top:1px}
-
-  /* STATUS PILL */
-  .status-pill{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:0.63rem;font-weight:600;letter-spacing:0.07em;padding:3px 10px;border-radius:999px;border:1px solid;white-space:nowrap;flex-shrink:0}
-  .status-pill.online{color:var(--green-hi);border-color:rgba(63,185,80,0.35);background:var(--green-dim)}
-  .status-pill.offline{color:var(--red);border-color:rgba(248,81,73,0.35);background:var(--red-dim)}
-  .status-pill.bot-tag{color:var(--blue);border-color:rgba(88,166,255,0.35);background:var(--blue-dim)}
-
-  /* BAR STRIP */
-  .bar-wrap{padding:0 16px 12px}
-  .bar-strip{display:flex;gap:2px;height:28px;align-items:stretch}
-  .seg{flex:1;border-radius:3px;position:relative;cursor:default;transition:filter .15s,transform .15s}
-  .seg.ok{background:var(--green)}
-  .seg.down{background:var(--red)}
-  .seg.empty{background:#1c2333}
-  .seg:hover{filter:brightness(1.4);transform:scaleY(1.08);transform-origin:bottom;z-index:5}
-  .seg::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:#1c2333;color:var(--text);font-family:var(--mono);font-size:0.58rem;white-space:nowrap;padding:4px 8px;border-radius:5px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 4px 14px rgba(0,0,0,.5);pointer-events:none;opacity:0;transition:opacity .15s;z-index:50}
-  .seg:hover::after{opacity:1}
-  .bar-dates{display:flex;justify-content:space-between;margin-top:5px;font-family:var(--mono);font-size:0.58rem;color:var(--muted)}
-
-  /* UPTIME BLOCK */
-  .uptime-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 16px 14px;margin-top:20px}
-  .uptime-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  .uptime-title{font-size:0.8rem;color:var(--sub)}
-  .uptime-pct{font-family:var(--mono);font-size:0.8rem;color:var(--green-hi)}
-  .bar-strip.big{height:36px}
-  .bar-strip.big .seg{border-radius:4px}
-
-  /* DIVIDER */
-  .divider{border:none;border-top:1px solid var(--border);margin:24px 0 0}
-
-  /* TIMESTAMP */
-  .timestamp{text-align:center;font-family:var(--mono);font-size:0.62rem;color:var(--muted);margin-top:22px}
-
-  /* FOOTER */
-  footer{text-align:center;margin-top:50px;font-size:0.65rem;color:var(--muted)}
-  footer span{color:var(--green-hi)}
-
-  /* SKELETON */
-  .skeleton{background:linear-gradient(90deg,var(--surface) 25%,#161b27 50%,var(--surface) 75%);background-size:200% 100%;animation:shimmer 1.3s infinite;border-radius:10px;height:68px;margin-bottom:7px}
-  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-  @media(max-width:480px){
-    .stats-row{grid-template-columns:repeat(2,1fr)}
-    .topbar{padding:11px 14px}
-    .hero{padding:36px 14px 22px}
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- BG CANVAS -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- TOPBAR -->
 <div class="topbar">
   <div class="topbar-logo">
-    <div class="logo-dot"></div>
+    <div class="logo-mark">
+      <span></span><span></span><span></span><span></span>
+    </div>
     STATUS
   </div>
   <div class="topbar-right">
+    <!-- BG MODE TOGGLE -->
+    <button id="mode-btn">❄ SNOW</button>
+
     <div id="global-pill" class="global-pill offline">
       <div class="dot" id="global-dot"></div>
       <span id="global-text">กำลังโหลด</span>
     </div>
-    <a href="https://discord.gg/QekBfN38nU" target="_blank" class="discord-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+    <a href="https://discord.gg/QekBfN38nU" target="_blank" class="discord-btn" title="Discord">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+      </svg>
     </a>
   </div>
 </div>
 
+<!-- HERO -->
 <div class="hero">
-  <div class="hero-eyebrow">Real-time monitoring</div>
+  <div class="hero-eyebrow">Real-time monitoring · ᴰᵒᶻᵃʳᵉˢ</div>
   <h1 class="hero-title">ᴄʜᴇᴄᴋ ꜱᴛᴀᴛᴜꜱ ʙᴏᴛ</h1>
-  <p class="hero-sub">ระบบตรวจสอบสถานะ · ᵇʸ ᴰᵒᶻᵃʳᵉˢ</p>
+  <p class="hero-sub">ระบบตรวจสอบสถานะแบบเรียลไทม์</p>
 </div>
 
 <div class="container">
@@ -165,12 +62,12 @@
     </div>
     <div class="stat-card">
       <div class="stat-num dim" id="stat-total">—</div>
-      <div class="stat-label">ผู้ใช้ทั้งหมด</div>
+      <div class="stat-label">ทั้งหมด</div>
     </div>
   </div>
 
   <!-- BOT SECTION -->
-  <div class="section-header">
+  <div class="section-header reveal">
     <div class="section-icon bot">🤖</div>
     <div class="section-title">Bot · ตัวบอทหลัก</div>
     <div class="section-count" id="bot-count"></div>
@@ -182,21 +79,21 @@
   <hr class="divider">
 
   <!-- USERS SECTION -->
-  <div class="section-header">
+  <div class="section-header reveal">
     <div class="section-icon user">👤</div>
     <div class="section-title">Users · ผู้ใช้งานบอท</div>
     <div class="section-count" id="user-count"></div>
   </div>
   <div id="user-section">
     <div class="skeleton"></div>
-    <div class="skeleton" style="opacity:.5"></div>
+    <div class="skeleton" style="opacity:.4;animation-delay:.15s"></div>
   </div>
 
   <!-- UPTIME -->
-  <div class="uptime-block">
+  <div class="uptime-block reveal">
     <div class="uptime-header">
       <div class="uptime-title">Overall uptime · 30 วันล่าสุด</div>
-      <div class="uptime-pct" id="uptime-pct">100%</div>
+      <div class="uptime-pct" id="uptime-pct">—</div>
     </div>
     <div class="bar-strip big" id="big-strip"></div>
     <div class="bar-dates">
@@ -210,63 +107,85 @@
 
 <footer>© 2017–2028 · <span>ᴰᵒᶻᵃʳᵉˢ</span> Developer · All rights reserved</footer>
 
+<!-- BG EFFECT (load first so canvas is ready) -->
+<script src="bg.js"></script>
+
 <script>
-// ── helpers ──────────────────────────────
+// ── Scroll reveal ──────────────────────────────
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+// ── Count-up ────────────────────────────────
+function countUp(el, target, duration = 650) {
+  const start = performance.now();
+  (function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.floor(target * e);
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  })(start);
+}
+
+// ── Helpers ─────────────────────────────────
 function dateLabel(daysAgo) {
   const d = new Date();
   d.setDate(d.getDate() - daysAgo);
-  return d.toLocaleDateString('th-TH', { day:'numeric', month:'short' });
+  return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
 }
 
-function buildStrip(container, isOnline, height='') {
+function buildStrip(container, isOnline) {
   container.innerHTML = '';
-  if (height) container.style.height = height;
   for (let i = 29; i >= 0; i--) {
-    const label = dateLabel(i);
-    const s = document.createElement('div');
     const cls = (i === 0 && !isOnline) ? 'down' : 'ok';
+    const s = document.createElement('div');
     s.className = 'seg ' + cls;
-    s.setAttribute('data-tip', label + ' · ' + (cls === 'ok' ? 'Online' : 'Offline'));
+    s.setAttribute('data-tip', dateLabel(i) + ' · ' + (cls === 'ok' ? '✓ Online' : '✗ Offline'));
+    // staggered pop-in
+    s.style.cssText = 'opacity:0;transform:scaleY(0);transform-origin:bottom;transition:opacity .2s '+(i*9)+'ms,transform .28s '+(i*9)+'ms cubic-bezier(.34,1.56,.64,1)';
     container.appendChild(s);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      s.style.opacity = '';
+      s.style.transform = '';
+    }));
   }
 }
 
 function avatarUrl(bot) {
-  if (!bot) return null;
-  if (!bot.avatarHash) return null;
+  if (!bot || !bot.avatarHash) return null;
   const ext = bot.avatarHash.startsWith('a_') ? 'gif' : 'png';
   const cdn = `https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatarHash}.${ext}?size=64`;
   return `https://wsrv.nl/?url=${encodeURIComponent(cdn)}&w=64&h=64&fit=cover&mask=circle&output=png`;
 }
 
-function makeCard(bot, isOnline, showBotBadge = false) {
-  const name    = bot.displayName || bot.username || '—';
-  const sub     = '@' + (bot.username || '');
-  const imgUrl  = avatarUrl(bot);
+function makeCard(bot, isOnline, showBotBadge = false, delay = 0) {
+  const name   = bot.displayName || bot.username || '—';
+  const sub    = '@' + (bot.username || '');
+  const imgUrl = avatarUrl(bot);
 
   const avatarHTML = imgUrl
-    ? `<img src="${imgUrl}" class="avatar-img" onerror="this.style.display='none'" />`
+    ? `<img src="${imgUrl}" class="avatar-img" onerror="this.style.display='none'">`
     : `<div class="avatar-fallback">${showBotBadge ? '🤖' : '👤'}</div>`;
 
-  const badgeHTML = showBotBadge ? `<div class="bot-badge">BOT</div>` : '';
-
-  const miniStrip = (() => {
-    let h = '';
-    for (let i = 29; i >= 0; i--) {
-      const cls = (i === 0 && !isOnline) ? 'down' : 'ok';
-      h += `<div class="seg ${cls}" data-tip="${dateLabel(i)} · ${cls==='ok'?'Online':'Offline'}"></div>`;
-    }
-    return h;
-  })();
+  let miniStrip = '';
+  for (let i = 29; i >= 0; i--) {
+    const cls = (i === 0 && !isOnline) ? 'down' : 'ok';
+    miniStrip += `<div class="seg ${cls}" data-tip="${dateLabel(i)} · ${cls==='ok'?'✓ Online':'✗ Offline'}"></div>`;
+  }
 
   const card = document.createElement('div');
   card.className = 'card';
+  card.style.animationDelay = delay + 'ms';
   card.innerHTML = `
     <div class="card-inner">
       <div class="card-left">
         <div class="avatar-wrap">
           ${avatarHTML}
-          ${badgeHTML}
+          ${showBotBadge ? '<div class="bot-badge">BOT</div>' : ''}
         </div>
         <div>
           <div class="card-name">${name}</div>
@@ -281,74 +200,83 @@ function makeCard(bot, isOnline, showBotBadge = false) {
     <div class="bar-wrap">
       <div class="bar-strip">${miniStrip}</div>
       <div class="bar-dates"><span>${dateLabel(29)}</span><span>วันนี้</span></div>
-    </div>
-  `;
+    </div>`;
+
+  // stagger mini-strip after card is in DOM
+  setTimeout(() => {
+    card.querySelectorAll('.seg').forEach((seg, i) => {
+      seg.style.cssText = 'opacity:0;transform:scaleY(0);transform-origin:bottom;transition:opacity .2s '+(i*7)+'ms,transform .25s '+(i*7)+'ms cubic-bezier(.34,1.56,.64,1)';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        seg.style.opacity = ''; seg.style.transform = '';
+      }));
+    });
+  }, delay + 60);
+
   return card;
 }
 
-// ── fetch ─────────────────────────────────
+// ── Data fetch ──────────────────────────────
 fetch('status.json?t=' + Date.now())
   .then(r => r.json())
   .then(data => {
-    const now = Math.floor(Date.now() / 1000);
+    const now      = Math.floor(Date.now() / 1000);
     const isOnline = (now - data.last_seen) < 360;
+    const users    = Array.isArray(data.active_selfbots) ? data.active_selfbots : [];
+    const onlineU  = isOnline ? users.length : 0;
+    const offlineU = users.length - onlineU;
+    const hasBot   = !!data.bot_info;
 
-    const users = (data.active_selfbots && data.active_selfbots.length > 0)
-      ? data.active_selfbots
-      : [];
-
-    const onlineUsers  = isOnline ? users.length : 0;
-    const offlineUsers = users.length - onlineUsers;
-    const hasBotInfo   = !!data.bot_info;
-
-    // stats
-    document.getElementById('stat-bot').textContent     = hasBotInfo ? '1' : '0';
-    document.getElementById('stat-online').textContent  = onlineUsers;
-    document.getElementById('stat-offline').textContent = offlineUsers;
-    document.getElementById('stat-total').textContent   = users.length;
+    // stats count-up
+    setTimeout(() => {
+      countUp(document.getElementById('stat-bot'),     hasBot ? 1 : 0, 500);
+      countUp(document.getElementById('stat-online'),  onlineU,        700);
+      countUp(document.getElementById('stat-offline'), offlineU,       700);
+      countUp(document.getElementById('stat-total'),   users.length,   800);
+    }, 400);
 
     // global pill
     const pill = document.getElementById('global-pill');
-    const dot  = document.getElementById('global-dot');
     if (isOnline) {
       pill.className = 'global-pill online';
-      dot.className  = 'dot pulse';
+      document.getElementById('global-dot').className  = 'dot pulse';
       document.getElementById('global-text').textContent = 'ALL SYSTEMS ONLINE';
     } else {
       pill.className = 'global-pill offline';
-      dot.className  = 'dot';
+      document.getElementById('global-dot').className  = 'dot';
       document.getElementById('global-text').textContent = 'OFFLINE';
     }
 
-    // ── BOT SECTION ──
-    const botSection = document.getElementById('bot-section');
-    botSection.innerHTML = '';
-    if (hasBotInfo) {
-      botSection.appendChild(makeCard(data.bot_info, isOnline, true));
+    // bot section
+    const botSec = document.getElementById('bot-section');
+    botSec.innerHTML = '';
+    if (hasBot) {
+      botSec.appendChild(makeCard(data.bot_info, isOnline, true, 0));
       document.getElementById('bot-count').textContent = '1 ตัว';
     } else {
-      botSection.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:0.82rem;">ไม่พบข้อมูลบอทหลัก</div>';
+      botSec.innerHTML = '<div style="text-align:center;padding:26px;color:var(--muted);font-size:.82rem;font-family:var(--mono)">— ไม่พบข้อมูลบอทหลัก —</div>';
       document.getElementById('bot-count').textContent = '0 ตัว';
     }
 
-    // ── USERS SECTION ──
-    const userSection = document.getElementById('user-section');
-    userSection.innerHTML = '';
+    // users section
+    const userSec = document.getElementById('user-section');
+    userSec.innerHTML = '';
     if (users.length === 0) {
-      userSection.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:0.82rem;">ไม่มีผู้ใช้งานบอท</div>';
+      userSec.innerHTML = '<div style="text-align:center;padding:26px;color:var(--muted);font-size:.82rem;font-family:var(--mono)">— ไม่มีผู้ใช้งานบอท —</div>';
     } else {
-      users.forEach(bot => {
-        // รองรับ format เก่า (string) ด้วย
+      users.forEach((bot, idx) => {
         const obj = typeof bot === 'object' ? bot : { username: String(bot).split('#')[0], displayName: String(bot).split('#')[0] };
-        userSection.appendChild(makeCard(obj, isOnline, false));
+        userSec.appendChild(makeCard(obj, isOnline, false, idx * 80));
       });
     }
     document.getElementById('user-count').textContent = users.length + ' คน';
 
-    // big strip
+    // big uptime strip
     buildStrip(document.getElementById('big-strip'), isOnline);
-    document.getElementById('date-from').textContent = dateLabel(29);
-    document.getElementById('uptime-pct').textContent = isOnline ? '100%' : '99.7%';
+    document.getElementById('date-from').textContent   = dateLabel(29);
+    document.getElementById('uptime-pct').textContent  = isOnline ? '100%' : '99.7%';
+
+    // re-observe reveals
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => ro.observe(el));
 
     // timestamp
     const d = new Date(data.last_seen * 1000);
@@ -356,11 +284,12 @@ fetch('status.json?t=' + Date.now())
       'อัปเดตล่าสุด · ' + d.toLocaleDateString('th-TH') + ' · ' + d.toLocaleTimeString('th-TH');
   })
   .catch(() => {
-    document.getElementById('bot-section').innerHTML =
-      '<div style="text-align:center;padding:24px;color:var(--red);font-size:0.82rem;">⚠️ โหลดข้อมูลไม่ได้</div>';
+    document.getElementById('bot-section').innerHTML  = '<div style="text-align:center;padding:26px;color:var(--red);font-size:.82rem;font-family:var(--mono)">⚠ โหลดข้อมูลไม่ได้</div>';
     document.getElementById('user-section').innerHTML = '';
     document.getElementById('global-text').textContent = 'ERROR';
     buildStrip(document.getElementById('big-strip'), false);
+    document.getElementById('uptime-pct').textContent  = '—';
+    document.getElementById('timestamp').textContent   = 'ไม่สามารถเชื่อมต่อได้';
   });
 </script>
 </body>
